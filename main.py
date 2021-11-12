@@ -1,13 +1,17 @@
 from playsound import playsound
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from src.bot import BestBuyBot, AmazonBot
+from src.bot import BestBuyBot, AmazonBot, MicrosoftBot
 
 
 CVV = "957"
+#Microsoft Password
+PASSWORD = ""
 # This is the URL of the products
 BEST_BUY_PRODUCT_URL = "https://www.bestbuy.ca/en-ca/product/playstation-5-digital-edition-console-online-only/14962184"
 AMAZON_PRODUCT_URL = "https://www.amazon.ca/Playstation-3005721-PlayStation-Digital-Edition/dp/B08GS1N24H"
+#Xbox Series X Halo Infinite Console
+MICROSOFT_PRODUCT_URL = "https://www.xbox.com/en-us/configure/8RPM8T9CK0P6?ranMID=24542&ranEAID=AKGBlS8SPlM&ranSiteID=AKGBlS8SPlM-xudy84QJWx1blRDEoUU_Mg&epi=AKGBlS8SPlM-xudy84QJWx1blRDEoUU_Mg&irgwc=1&OCID=AID2200057_aff_7593_1243925&tduid=%28ir__nxpdxmc0tgkf6nvysnvndaaqq22xowa6bgpcqyhc00%29%287593%29%281243925%29%28AKGBlS8SPlM-xudy84QJWx1blRDEoUU_Mg%29%28%29&irclickid=_nxpdxmc0tgkf6nvysnvndaaqq22xowa6bgpcqyhc00"
 
 # This is the expected prices of the product. ( For avoiding resellers)
 AMAZON_EXPECTED_PRICES = [499.99, 529.99, 539.99, 519.99]
@@ -43,6 +47,9 @@ if __name__ == '__main__':
     amazon_bot = AmazonBot(AMAZON_PRODUCT_URL, CVV, DRIVER, AMAZON_EXPECTED_PRICES)
     amazon_bot.amazon_login()
     bots_c.append(amazon_bot)
+    microsoft_bot = MicrosoftBot(MICROSOFT_PRODUCT_URL, PASSWORD, DRIVER)
+    microsoft_bot.microsoft_login()
+    bots_c.append(microsoft_bot)
     check_availability_all(bots_c)
 
 
