@@ -22,6 +22,8 @@ class Bcolors:
 # BEST BUY Web Elements
 ADD_TO_CART_BTN_VALUE_XPATH = "/html/body/div[1]/div/div[4]/div[1]/div[2]/div[2]/div[3]/div/div/div/form/button"
 CHECKOUT_BTN_XPATH = "/html/body/div[1]/div/div[4]/div[2]/div[2]/section/div/section/section[2]/div[2]/div/a"
+ADD_TO_CART_BTN_VALUE_XPATH_XBOX = "/html/body/div[1]/div/div/div[3]/section/div/div/div/div/div/div[3]/button"
+CHECKOUT_BTN_XPATH_XBOX = "/html/body/section/div[1]/div/div/div/div/div/section[2]/div/div/button"
 
 
 class BestBuyBot:
@@ -254,3 +256,99 @@ class AmazonBot:
         else:
             print(f"[{datetime.now().strftime('%H:%M:%S')}] {Bcolors.FAIL}{self.id} :: OUT OF STOCK{Bcolors.ENDC}")
             return False
+class MicrosoftBot:
+    def __init__(self, microsoft_buy_product_url, password, driver_c):
+        self.driver = driver_c
+        self.driver.execute_script("window.open('');")
+        self.driver.switch_to_window(self.driver.window_handles[0])
+        self.driver.get("https://www.xbox.com/")
+        self.id = "Xbox-us"
+        self.password = password
+        self.XBOX_BUY_PRODUCT_URL = microsoft_buy_product_url
+        print(f"[!] Your Xbox specs by now :\Xbox Product URL : {self.XBOX_BUY_PRODUCT_URL}")
+
+    def microsoft_login(self):
+        input(f"Please login to your Xbox account manually. When finished, just click enter here...")
+
+    def goto_cart(self):
+        self.driver.get("https://www.microsoft.com/en-us/store/cart")
+        sleep(2.8)
+        while True:
+            try:
+                log_file.write(f"[{datetime.now().strftime('%H:%M:%S')}] [$] CLicking on Checkout")
+                self.driver.find_element_by_xpath(CHECKOUT_BTN_XPATH_XBOX).click()
+                break
+            except:
+                sleep(1)
+                log_file.write(f"[{datetime.now().strftime('%H:%M:%S')}] [$] CLicking on Checkout AGAIN")
+        sleep(3.7)
+        log_file.write(f"[{datetime.now().strftime('%H:%M:%S')}] [$] Sending CVV")
+        s=0
+        while True:
+            try:
+                self.driver.find_element_by_id("passwd").send_keys(self.password)
+                break
+            except:
+                if s>=10:
+                    #no password prompt
+                    print("No password prompt")
+                    break
+                s+=1 
+                sleep(1)
+        s=0 
+        try:
+            self.driver.find_element_by_xpath("/html/body/div/form[1]/div/div/div[2]/div[1]/div/div/div/div/div/div[3]/div/div[2]/div/div[5]/div[2]/div/div/div/div/input").click()
+        except:
+            print("No continue button after entering password")
+        while True:
+            try:
+                self.driver.find_element_by_xpath("/html/body/section/div[1]/div/div/div/div/div[3]/div/section[2]/div/button").click()
+                break
+            except:
+                try:
+                    self.driver.find_element_by_xpath("/html/body/section/div[1]/div/div/div/div/div[3]/div/section[1]/section[1]/div[2]/div[2]/div/button[2]").click()
+                    self.driver.find_element_by_xpath("/html/body/section/div[1]/div/div/div/div/div[3]/div/section[2]/div/button").click()
+                    break
+                except:
+                    sleep(1)
+        log_file.write(f"[{datetime.now().strftime('%H:%M:%S')}] [$$$$$$$$] MICROSOFT DONE")
+        
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] BOUGHT A SERIES X FROM : {self.id}")
+        return True
+
+
+    def check_availability_and_buy(self):
+        add_to_cart_btn = None
+        self.driver.switch_to.window(self.driver.window_handles[0])
+        available = False
+        self.driver.get(self.XBOX_BUY_PRODUCT_URL)
+        sleep(3.6)
+        try:
+            add_to_cart_btn = self.driver.find_element_by_xpath(ADD_TO_CART_BTN_VALUE_XPATH_XBOX)
+        except:
+            self.check_availability_and_buy()
+        try:
+            if add_to_cart_btn is not None:
+                if add_to_cart_btn.is_enabled():
+                    playsound('beep.mp3')
+                    log_file.write(
+                        f"[{datetime.now().strftime('%H:%M:%S')}] [$] PRODUCT IS AVAILABLE in Microsoft! Attempting to buy it..")
+                    print(
+                        f"[{datetime.now().strftime('%H:%M:%S')}] [$] PRODUCT IS AVAILABLE in Microsoft! Attempting to buy it..")
+                    available = True
+                if available:
+                    add_to_cart_btn.click()
+                    log_file.write(f"[{datetime.now().strftime('%H:%M:%S')}] [$] Clicked on add_to_cart")
+                    sleep(2.7)
+                    self.goto_cart()
+                    return True
+                else:
+                    print(
+                        f"[{datetime.now().strftime('%H:%M:%S')}] {self.id} :: OUT OF STOCK")
+                    return False
+            else:
+                self.check_availability_and_buy()
+
+        except:
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] {self.id} :: OUT OF STOCK")
+
